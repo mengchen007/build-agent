@@ -9,6 +9,26 @@ const selectBtn = ref(null)
 const videoDetails = ref(null)
 
 const currentVideo = ref(null)
+const monitorIcon = '🎥'
+const monitorList = [
+  { id: 1, name: '大楼东侧', status: 'active' },
+  { id: 2, name: '大楼西侧', status: 'active' },
+  { id: 3, name: '大楼南侧', status: 'active' },
+  { id: 4, name: '大楼北侧', status: 'active' },
+  { id: 5, name: '大厅区域', status: 'active' },
+  { id: 6, name: '走廊区域', status: 'active' }
+]
+const monitors = ref(monitorList.map(item => ({ ...item, icon: monitorIcon })))
+const selectedMonitors = ref([1, 2, 3, 4, 5, 6])
+
+const toggleMonitor = (monitorId) => {
+  const index = selectedMonitors.value.indexOf(monitorId)
+  if (index > -1) {
+    selectedMonitors.value.splice(index, 1)
+  } else {
+    selectedMonitors.value.push(monitorId)
+  }
+}
 
 const handleDragOver = (e) => {
   e.preventDefault()
@@ -58,7 +78,7 @@ const loadVideo = (file) => {
 const selectVideo = () => {
   currentVideo.value = videoPreview.value.src
   selectBtn.value.textContent = '✅ 视频已选择'
-  selectBtn.value.style.background = 'linear-gradient(45deg, #00ff00, #00aa00)'
+  selectBtn.value.style.background = 'rgba(144, 192, 144, 0.8)'
 }
 
 const formatTime = (seconds) => {
@@ -92,25 +112,57 @@ onMounted(() => {
 
 <template>
   <div class="left-panel">
-    <h2 class="panel-title">🎥 视频数据源</h2>
+    <!-- 上半部分：导入视频 -->
+    <div class="video-section">
+      <h2 class="panel-title">🎥 导入视频</h2>
 
-    <div class="upload-zone" ref="uploadZone">
-      <div class="upload-icon">📁</div>
-      <p>拖拽视频文件到此处</p>
-      <p style="font-size: 12px; color: #888; margin-top: 5px;">
-        支持 MP4, AVI, MOV 格式
-      </p>
-      <input type="file" ref="videoInput" accept="video/*" style="display: none;">
+      <div class="upload-zone" ref="uploadZone">
+        <div class="upload-icon">📁</div>
+        <p>拖拽视频文件到此处</p>
+        <p style="font-size: 12px; color: #888; margin-top: 5px;">
+          支持 MP4, AVI, MOV 格式
+        </p>
+        <input type="file" ref="videoInput" accept="video/*" style="display: none;">
+      </div>
+
+      <video class="video-preview" ref="videoPreview" controls muted></video>
+
+      <div class="video-info" ref="videoInfo">
+        <h4 style="color: #a0c0e0; margin-bottom: 10px;">📊 视频信息</h4>
+        <div ref="videoDetails"></div>
+      </div>
+
+      <button class="select-btn" ref="selectBtn">选择此视频进行分析</button>
     </div>
 
-    <video class="video-preview" ref="videoPreview" controls muted></video>
+    <!-- 下半部分：接入监控 -->
+    <div class="monitor-section">
+      <h2 class="panel-title">📹 接入监控</h2>
 
-    <div class="video-info" ref="videoInfo">
-      <h4 style="color: #00f5ff; margin-bottom: 10px;">📊 视频信息</h4>
-      <div ref="videoDetails"></div>
+      <div class="monitor-grid">
+        <div
+          v-for="monitor in monitors"
+          :key="monitor.id"
+          class="monitor-item"
+          :class="{ active: selectedMonitors.includes(monitor.id) }"
+          @click="toggleMonitor(monitor.id)"
+        >
+          <div class="monitor-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 7l-7 5 7 5V7z"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              <circle cx="5.5" cy="9.5" r="1"/>
+            </svg>
+          </div>
+          <div class="monitor-name">{{ monitor.name }}</div>
+          <div class="monitor-status" :class="monitor.status"></div>
+        </div>
+      </div>
+
+      <div class="selected-count">
+        已选择 {{ selectedMonitors.length }} 个监控点
+      </div>
     </div>
-
-    <button class="select-btn" ref="selectBtn">选择此视频进行分析</button>
   </div>
 </template>
 
@@ -120,12 +172,14 @@ onMounted(() => {
   background: rgba(15, 15, 30, 0.9);
   border-radius: 16px;
   padding: 16px;
-  border: 1px solid rgba(100, 255, 255, 0.25);
+  border: 1px solid rgba(120, 140, 160, 0.25);
   backdrop-filter: blur(20px);
-  box-shadow: 0 12px 28px rgba(0, 100, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(80, 100, 120, 0.15);
   position: relative;
   overflow: hidden;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .left-panel::before {
@@ -152,10 +206,7 @@ onMounted(() => {
 .panel-title {
   font-size: 18px;
   font-weight: bold;
-  background: linear-gradient(45deg, #00f5ff, #0080ff, #8000ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #a0c0e0;
   margin-bottom: 14px;
   text-align: center;
   position: relative;
@@ -176,20 +227,20 @@ onMounted(() => {
 }
 
 .upload-zone:hover {
-  border-color: #00f5ff;
-  background: rgba(0, 245, 255, 0.1);
+  border-color: #a0c0e0;
+  background: rgba(160, 192, 224, 0.1);
   transform: scale(1.02);
 }
 
 .upload-zone.dragover {
-  border-color: #8000ff;
-  background: rgba(128, 0, 255, 0.2);
+  border-color: #b0a0d0;
+  background: rgba(176, 160, 208, 0.2);
   transform: scale(1.05);
 }
 
 .upload-icon {
   font-size: 40px;
-  color: #00f5ff;
+  color: #a0c0e0;
   margin-bottom: 10px;
   animation: float 2s ease-in-out infinite;
 }
@@ -216,7 +267,7 @@ onMounted(() => {
   border-radius: 10px;
   margin-bottom: 12px;
   display: none;
-  box-shadow: 0 8px 20px rgba(0, 245, 255, 0.28);
+  box-shadow: 0 4px 12px rgba(120, 140, 160, 0.2);
   position: relative;
   z-index: 10;
 }
@@ -225,7 +276,7 @@ onMounted(() => {
   background: rgba(0, 0, 0, 0.7);
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid rgba(100, 255, 255, 0.25);
+  border: 1px solid rgba(120, 140, 160, 0.25);
   display: none;
   position: relative;
   z-index: 10;
@@ -240,10 +291,10 @@ onMounted(() => {
 .select-btn {
   width: 100%;
   padding: 10px;
-  background: linear-gradient(45deg, #00f5ff, #0080ff);
-  border: none;
+  background: rgba(120, 140, 160, 0.8);
+  border: 1px solid rgba(160, 180, 200, 0.5);
   border-radius: 20px;
-  color: #000;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
   margin-top: 8px;
@@ -255,6 +306,106 @@ onMounted(() => {
 
 .select-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 5px 20px rgba(0, 245, 255, 0.5);
+  background: rgba(140, 160, 180, 0.9);
+  box-shadow: 0 3px 12px rgba(120, 140, 160, 0.3);
+}
+
+/* ========== 视频部分区域 ========== */
+.video-section {
+  flex: 0 0 auto;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(120, 140, 160, 0.2);
+}
+
+/* ========== 监控接入区域 ========== */
+.monitor-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  flex: 1;
+  align-content: start;
+}
+
+.monitor-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  background: rgba(40, 50, 70, 0.6);
+  border: 1px solid rgba(80, 100, 120, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 0;
+}
+
+.monitor-item:hover {
+  background: rgba(60, 80, 100, 0.8);
+  border-color: rgba(120, 140, 160, 0.5);
+  transform: translateY(-2px);
+}
+
+.monitor-item.active {
+  background: rgba(80, 120, 100, 0.6);
+  border-color: rgba(144, 192, 144, 0.6);
+}
+
+.monitor-icon {
+  color: #a0c0e0;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.monitor-name {
+  font-size: 16px;
+  color: #ccc;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.monitor-status {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #90c090;
+}
+
+.monitor-status.active {
+  background: #90c090;
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.selected-count {
+  text-align: center;
+  color: #a0c0e0;
+  font-size: 12px;
+  margin-top: 10px;
+  padding: 6px;
+  background: rgba(40, 50, 70, 0.5);
+  border-radius: 6px;
 }
 </style>

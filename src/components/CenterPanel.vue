@@ -20,6 +20,7 @@ const currentFrameIndex = ref(0)
 const progress = ref(0)
 const currentStatusMessage = ref('正在初始化深度学习模型...')
 const showFrameAnalysis = ref(false)
+let carouselTimer = null
 
 
 
@@ -27,7 +28,7 @@ const startAnalysis = async () => {
   isAnalyzing.value = true
   analysisDisplay.value.style.display = 'block'
   resultDisplay.value.style.display = 'none'
-  showFrameAnalysis.value = false
+  showFrameAnalysis.value = true
   progress.value = 0
   currentFrameIndex.value = 0
 
@@ -37,8 +38,14 @@ const startAnalysis = async () => {
     analysisStatus.value.classList.remove('hidden')
   }
 
+  // 启动轮播
+  startCarousel()
+
   // 运行分析步骤
   await runAnalysisSteps()
+
+  // 停止轮播
+  stopCarousel()
 
   // 分析完成后，启动思考过程
   if (intelligentThinkingProcess.value) {
@@ -54,46 +61,93 @@ const startAnalysis = async () => {
 const showResults = () => {
   resultDisplay.value.style.display = 'block'
   resultDisplay.value.innerHTML = `
-    <h3 style="color: #ff00ff; margin-bottom: 12px; font-size: 18px;">📈 一周能源效率多模态分析报告</h3>
+    <h3 style="color: #b0b0d0; margin-bottom: 12px; font-size: 18px;">📈 一周能源效率多模态分析报告</h3>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px;">
-      <div style="background: rgba(0,100,255,0.2); padding: 12px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.3);">
-        <h4 style="color: #00ffff; font-size: 13px;">📊 综合评分</h4>
-        <div style="font-size: 22px; color: #00ff00; font-weight: bold;">78.6%</div>
+      <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
+        <h4 style="color: #a0c0e0; font-size: 13px;">📊 综合评分</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">78.6%</div>
         <p style="font-size: 10px; color: #ccc;">较上周提升 +3.2%</p>
       </div>
 
-      <div style="background: rgba(255,0,100,0.2); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,0,255,0.3);">
-        <h4 style="color: #ff00ff; font-size: 13px;">⚡ 节能潜力</h4>
-        <div style="font-size: 22px; color: #ffff00; font-weight: bold;">6%–11%</div>
+      <div style="background: rgba(80,60,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(140,120,160,0.4);">
+        <h4 style="color: #c0a0e0; font-size: 13px;">⚡ 节能潜力</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">6%–11%</div>
         <p style="font-size: 10px; color: #ccc;">预估节省 250–470 kWh/天</p>
       </div>
 
-      <div style="background: rgba(0,255,100,0.2); padding: 12px; border-radius: 10px; border: 1px solid rgba(0,255,0,0.3);">
-        <h4 style="color: #00ff80; font-size: 13px;">🔋 平均功耗</h4>
-        <div style="font-size: 22px; color: #00ff00; font-weight: bold;">172kW</div>
+      <div style="background: rgba(60,100,80,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,160,140,0.4);">
+        <h4 style="color: #a0e0c0; font-size: 13px;">🔋 平均功耗</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">172kW</div>
         <p style="font-size: 10px; color: #ccc;">峰值: 260kW</p>
       </div>
 
-      <div style="background: rgba(255,100,0,0.2); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,165,0,0.3);">
-        <h4 style="color: #ffa500; font-size: 13px;">🌡️ 环境指数</h4>
-        <div style="font-size: 22px; color: #ffff00; font-weight: bold;">19.2°C</div>
+      <div style="background: rgba(100,80,60,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(160,140,120,0.4);">
+        <h4 style="color: #e0c0a0; font-size: 13px;">🌡️ 环境指数</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">19.2°C</div>
         <p style="font-size: 10px; color: #ccc;">适宜温度范围</p>
       </div>
     </div>
 
-    <div style="background: linear-gradient(135deg, rgba(100,0,255,0.2), rgba(255,0,100,0.2)); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,100,255,0.4); text-align: center;">
-      <h4 style="color: #ff00ff; margin-bottom: 10px; font-size: 14px;">🚀 AI驱动的未来预期</h4>
-      <p style="font-size: 14px; line-height: 1.6; color: #ffffff; margin: 0;">
-        通过持续的多模态学习和优化，预计在 <span style="color: #00ffff; font-weight: bold;">3个月内</span>
-        可将整体能源效率提升至 <span style="color: #00ff00; font-weight: bold;">85.2%</span>，
-        实现 <span style="color: #ffff00; font-weight: bold;">智能化、绿色化</span> 的能源管理目标。
-      </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+      <div style="background: rgba(50,60,70,0.5); padding: 14px; border-radius: 10px; border: 1px solid rgba(100,110,120,0.4);">
+        <h4 style="color: #9ab3c7; font-size: 14px; margin-bottom: 12px;">📊 整体使用分析</h4>
+        <div style="font-size: 13px; line-height: 1.5; color: #bbc5d0;">
+          <div style="margin-bottom: 6px;">• 高效时段：周三21:00 (91%)</div>
+          <div style="margin-bottom: 6px;">• 标准时段：周一09:00, 周五18:00</div>
+          <div style="margin-bottom: 6px;">• 待优化：周四12:00 (68%)</div>
+          <div>• 平均负载：0.79 (良好)</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(60,50,70,0.5); padding: 14px; border-radius: 10px; border: 1px solid rgba(110,100,120,0.4);">
+        <h4 style="color: #b5a3c7; font-size: 14px; margin-bottom: 12px;">⚡ 能耗模式识别</h4>
+        <div style="font-size: 13px; line-height: 1.5; color: #c5bbd0;">
+          <div style="margin-bottom: 6px;">• 办公模式：42% (上午时段)</div>
+          <div style="margin-bottom: 6px;">• 高效模式：28% (晚间优化)</div>
+          <div style="margin-bottom: 6px;">• 过渡模式：18% (傍晚时段)</div>
+          <div>• 低效模式：12% (需优化)</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: rgba(55,65,75,0.5); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.4); margin-bottom: 16px;">
+      <h4 style="color: #a8b8c8; font-size: 14px; margin-bottom: 12px;">🧠 深度学习分析发现</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; color: #c0c8d0;">
+        <div>
+          <div style="color: #98b5c9; margin-bottom: 8px;">🧠 神经网络识别：</div>
+          <div style="margin-bottom: 4px;">• 异常模式检测：3处长时照明</div>
+          <div style="margin-bottom: 4px;">• 行为模式分析：工作型67%</div>
+          <div>• 时序预测准确率：94.2%</div>
+        </div>
+        <div>
+          <div style="color: #a8a0c9; margin-bottom: 8px;">📊 多维度融合：</div>
+          <div style="margin-bottom: 4px;">• 空间分布热力图：东南角密度最高</div>
+          <div style="margin-bottom: 4px;">• 时间序列趋势：总体上升3.2%</div>
+          <div>• 环境关联度：温度影响占23%</div>
+        </div>
+      </div>
     </div>
   `
 }
 
 
+
+const startCarousel = () => {
+  carouselTimer = setInterval(() => {
+    if (analysisFrames.value.length > 0) {
+      currentFrameIndex.value = (currentFrameIndex.value + 1) % analysisFrames.value.length
+      displayFrameAnalysis(currentFrameIndex.value)
+    }
+  }, 1500)
+}
+
+const stopCarousel = () => {
+  if (carouselTimer) {
+    clearInterval(carouselTimer)
+    carouselTimer = null
+  }
+}
 
 const runAnalysisSteps = async () => {
   const steps = [
@@ -115,14 +169,7 @@ const runAnalysisSteps = async () => {
     currentStatusMessage.value = steps[i].message
     progress.value = steps[i].progress
 
-    // 在步骤3-7显示帧分析
-    if (i >= 3 && i < 8) {
-      showFrameAnalysis.value = true
-      currentFrameIndex.value = i - 3
-      displayFrameAnalysis(i - 3)
-    }
-
-    await sleep(1200)
+    await sleep(800)
   }
 
   // 分析完成，隐藏状态指示器
@@ -316,7 +363,7 @@ onMounted(() => {
     <div class="search-container">
       <div class="search-box">
         <input type="text" class="search-input" ref="searchInput" placeholder="请评估过去一周能源使用效率？" value="请评估过去一周能源使用效率">
-        <button class="analyze-btn" ref="analyzeBtn">🚀 开始分析</button>
+        <button class="analyze-btn" ref="analyzeBtn">开始分析</button>
       </div>
     </div>
 
@@ -379,14 +426,14 @@ onMounted(() => {
 }
 
 .center-panel::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  background: rgba(120, 140, 160, 0.8);
   border-radius: 4px;
   transition: all 0.3s ease;
 }
 
 .center-panel::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #ff0080, #0080ff);
-  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  background: rgba(140, 160, 180, 0.9);
+  box-shadow: 0 0 5px rgba(120, 140, 160, 0.3);
 }
 
 .center-panel::before {
@@ -396,9 +443,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(255, 0, 100, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(0, 255, 100, 0.1) 0%, transparent 50%);
+  background: rgba(20, 25, 35, 0.1);
   pointer-events: none;
 }
 
@@ -434,10 +479,11 @@ onMounted(() => {
 .analyze-btn {
   position: absolute;
   right: 5px;
-  top: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   padding: 15px 30px;
-  background: linear-gradient(45deg, #ff0080, #8000ff);
-  border: none;
+  background: #4a90e2;
+  border: 1px solid #3a7bc8;
   border-radius: 45px;
   color: #fff;
   font-weight: bold;
@@ -446,8 +492,9 @@ onMounted(() => {
 }
 
 .analyze-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 5px 25px rgba(255, 0, 128, 0.6);
+  transform: translateY(-50%) scale(1.05);
+  background: #357abd;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
 }
 
 .analysis-display {
@@ -474,7 +521,7 @@ onMounted(() => {
 
 .status-text {
   font-size: 20px;
-  color: #00f5ff;
+  color: #a0c0e0;
   margin-bottom: 10px;
   animation: pulse 2s infinite;
 }
@@ -484,7 +531,7 @@ onMounted(() => {
   height: 50px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #00f5ff;
+  border-top-color: #a0c0e0;
   animation: spin 1s ease-in-out infinite;
   margin: 20px auto;
 }
@@ -504,7 +551,7 @@ onMounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(45deg, #00f5ff, #ff00ff);
+  background: rgba(100, 150, 200, 0.8);
   width: 0%;
   transition: width 0.3s;
   border-radius: 4px;
@@ -513,19 +560,19 @@ onMounted(() => {
 
 .status-message {
   color: #fff;
-  font-size: 14px;
+  font-size: 18px;
   margin: 10px 0;
 }
 
 .frame-carousel {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 400px;
   border-radius: 15px;
   overflow: hidden;
   margin-bottom: 20px;
   background: #000;
-  border: 1px solid rgba(0, 255, 255, 0.3);
+  border: 1px solid rgba(150, 150, 170, 0.3);
 }
 
 .frame-image {
@@ -545,8 +592,8 @@ onMounted(() => {
 
 .frame-image.analyzing {
   transform: scale(1.15);
-  filter: brightness(1.3) contrast(1.2) saturate(1.4);
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+  filter: brightness(1.1) contrast(1.1) saturate(1.1);
+  box-shadow: 0 0 15px rgba(150, 150, 170, 0.4);
 }
 
 .analysis-overlay {
@@ -555,10 +602,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg,
-    rgba(255, 0, 255, 0.1),
-    rgba(0, 255, 255, 0.1),
-    rgba(255, 255, 0, 0.1));
+  background: rgba(120, 140, 160, 0.1);
   opacity: 0;
   animation: analyzeFlash 1.5s infinite;
 }
@@ -572,7 +616,7 @@ onMounted(() => {
   background: rgba(0, 0, 0, 0.9);
   padding: 15px;
   border-radius: 10px;
-  border-left: 4px solid #00f5ff;
+  border-left: 4px solid #a0c0e0;
   margin-bottom: 15px;
   color: #fff;
   font-size: 13px;
@@ -584,11 +628,11 @@ onMounted(() => {
 }
 
 .result-display {
-  background: linear-gradient(135deg, rgba(0, 50, 100, 0.3), rgba(50, 0, 100, 0.3));
+  background: rgba(40, 40, 60, 0.6);
   border-radius: 12px;
   padding: 16px;
   margin-top: 12px;
-  border: 1px solid rgba(100, 255, 255, 0.35);
+  border: 1px solid rgba(150, 150, 170, 0.35);
   display: none;
   color: #fff;
 }
