@@ -63,7 +63,7 @@ const showResults = () => {
   resultDisplay.value.innerHTML = `
     <h3 style="color: #b0b0d0; margin-bottom: 12px; font-size: 18px;">📈 一周能源效率多模态分析报告</h3>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 15px;">
       <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
         <h4 style="color: #a0c0e0; font-size: 13px;">📊 综合评分</h4>
         <div style="font-size: 22px; color: #90c090; font-weight: bold;">78.6%</div>
@@ -90,9 +90,9 @@ const showResults = () => {
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-      <div style="background: rgba(50,60,70,0.5); padding: 14px; border-radius: 10px; border: 1px solid rgba(100,110,120,0.4);">
-        <h4 style="color: #9ab3c7; font-size: 14px; margin-bottom: 12px;">📊 整体使用分析</h4>
-        <div style="font-size: 13px; line-height: 1.5; color: #bbc5d0;">
+      <div style="background: rgba(50,60,70,0.4); padding: 14px; border-radius: 10px; border: 1px solid rgba(100,110,120,0.3);">
+        <h4 style="color: #9ab3c7; font-size: 16px; margin-bottom: 12px;">📊 整体使用分析</h4>
+        <div style="font-size: 16px; line-height: 1.5; color: #bbc5d0;">
           <div style="margin-bottom: 6px;">• 高效时段：周三21:00 (91%)</div>
           <div style="margin-bottom: 6px;">• 标准时段：周一09:00, 周五18:00</div>
           <div style="margin-bottom: 6px;">• 待优化：周四12:00 (68%)</div>
@@ -100,9 +100,9 @@ const showResults = () => {
         </div>
       </div>
 
-      <div style="background: rgba(60,50,70,0.5); padding: 14px; border-radius: 10px; border: 1px solid rgba(110,100,120,0.4);">
-        <h4 style="color: #b5a3c7; font-size: 14px; margin-bottom: 12px;">⚡ 能耗模式识别</h4>
-        <div style="font-size: 13px; line-height: 1.5; color: #c5bbd0;">
+      <div style="background: rgba(60,50,70,0.4); padding: 14px; border-radius: 10px; border: 1px solid rgba(110,100,120,0.3);">
+        <h4 style="color: #b5a3c7; font-size: 16px; margin-bottom: 12px;">⚡ 能耗模式识别</h4>
+        <div style="font-size: 16px; line-height: 1.5; color: #c5bbd0;">
           <div style="margin-bottom: 6px;">• 办公模式：42% (上午时段)</div>
           <div style="margin-bottom: 6px;">• 高效模式：28% (晚间优化)</div>
           <div style="margin-bottom: 6px;">• 过渡模式：18% (傍晚时段)</div>
@@ -111,9 +111,9 @@ const showResults = () => {
       </div>
     </div>
 
-    <div style="background: rgba(55,65,75,0.5); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.4); margin-bottom: 16px;">
-      <h4 style="color: #a8b8c8; font-size: 14px; margin-bottom: 12px;">🧠 深度学习分析发现</h4>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; color: #c0c8d0;">
+    <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3); margin-bottom: 16px;">
+      <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">🧠 深度学习分析发现</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px; color: #c0c8d0;">
         <div>
           <div style="color: #98b5c9; margin-bottom: 8px;">🧠 神经网络识别：</div>
           <div style="margin-bottom: 4px;">• 异常模式检测：3处长时照明</div>
@@ -209,8 +209,8 @@ const displayFrameAnalysis = (frameIndex) => {
   // 更新提取信息显示
   if (extractionInfo.value) {
     extractionInfo.value.innerHTML = `
-      <h4 style="color: #00f5ff; margin-bottom: 10px;">🔍 ${analysisDetails.title}</h4>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+      <h4 style="color: #00f5ff; margin-bottom: 10px; font-size: 15px;">🔍 ${analysisDetails.title}</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 15px;">
         <div>⚡ 能源效率: <span style="color: #00ff00">${frame.energy}%</span></div>
         <div>🌡️ 环境温度: <span style="color: #ffff00">${analysisDetails.temp}°C</span></div>
         <div>💡 设备状态: <span style="color: #00ffff">${analysisDetails.devices}</span></div>
@@ -219,8 +219,8 @@ const displayFrameAnalysis = (frameIndex) => {
         <div>🎯 模式识别: <span style="color: #00ff80">${analysisDetails.mode}</span></div>
       </div>
       <div style="margin-top: 10px; padding: 8px; background: rgba(0,255,255,0.1); border-radius: 5px;">
-        <div style="font-size: 12px; color: #00ffff;">🔮 AI分析维度: ${analysisDetails.dimension}</div>
-        <div style="font-size: 12px; color: #ff00ff;">📈 置信度: ${analysisDetails.confidence}% | 处理: ${analysisDetails.processing}</div>
+        <div style="font-size: 15px; color: #00ffff;">🔮 AI分析维度: ${analysisDetails.dimension}</div>
+        <div style="font-size: 15px; color: #ff00ff;">📈 置信度: ${analysisDetails.confidence}% | 处理: ${analysisDetails.processing}</div>
       </div>
     `
   }
