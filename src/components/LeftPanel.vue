@@ -338,7 +338,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 4px;
+  padding: 6px 3px;
   background: rgba(40, 50, 70, 0.6);
   border: 1px solid rgba(80, 100, 120, 0.3);
   border-radius: 6px;
@@ -362,21 +362,27 @@ onMounted(() => {
 
 .monitor-icon {
   color: #a0c0e0;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.monitor-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
 .monitor-name {
-  font-size: 16px;
+  font-size: 12px;
   color: #ccc;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  padding: 0 2px;
 }
 
 .monitor-status {
