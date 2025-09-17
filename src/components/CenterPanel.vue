@@ -162,7 +162,7 @@ const runAnalysisSteps = async () => {
     { message: '效率指标计算...', progress: 75 },
     { message: '智能优化建议生成...', progress: 85 },
     { message: '综合评估报告生成...', progress: 95 },
-    { message: '✅ 多模态分析完成！', progress: 100 }
+    { message: '多模态分析完成！', progress: 100 }
   ]
 
   for (let i = 0; i < steps.length; i++) {
@@ -369,7 +369,7 @@ onMounted(() => {
 
     <div class="analysis-display" ref="analysisDisplay">
       <div class="analysis-status" ref="analysisStatus">
-        <div class="status-text">🤖 AI正在进行多模态分析...</div>
+        <!-- <div class="status-text">🤖 AI正在进行多模态分析...</div> -->
         <div class="loading-spinner"></div>
         <div class="progress-bar">
           <div class="progress-fill" ref="progressFill" :style="{ width: progress + '%' }"></div>
@@ -560,7 +560,7 @@ onMounted(() => {
 
 .status-message {
   color: #fff;
-  font-size: 18px;
+  font-size: 22px;
   margin: 10px 0;
 }
 
