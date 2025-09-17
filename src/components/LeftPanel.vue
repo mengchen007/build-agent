@@ -11,12 +11,12 @@ const videoDetails = ref(null)
 const currentVideo = ref(null)
 const monitorIcon = '🎥'
 const monitorList = [
-  { id: 1, name: '大楼东侧', status: 'active' },
-  { id: 2, name: '大楼西侧', status: 'active' },
-  { id: 3, name: '大楼南侧', status: 'active' },
-  { id: 4, name: '大楼北侧', status: 'active' },
-  { id: 5, name: '大厅区域', status: 'active' },
-  { id: 6, name: '走廊区域', status: 'active' }
+  { id: 1, name: '会议室A101', status: 'active' },
+  { id: 2, name: '会议室B203', status: 'active' },
+  { id: 3, name: '大会议室C1', status: 'active' },
+  { id: 4, name: '小会议室D2', status: 'active' },
+  { id: 5, name: '多媒体室E3', status: 'active' },
+  { id: 6, name: '培训室F4', status: 'active' }
 ]
 const monitors = ref(monitorList.map(item => ({ ...item, icon: monitorIcon })))
 const selectedMonitors = ref([1, 2, 3, 4, 5, 6])
@@ -135,9 +135,9 @@ onMounted(() => {
       <button class="select-btn" ref="selectBtn">选择此视频进行分析</button>
     </div>
 
-    <!-- 下半部分：接入监控 -->
+    <!-- 下半部分：选择会议室 -->
     <div class="monitor-section">
-      <h2 class="panel-title">📹 接入监控</h2>
+      <h2 class="panel-title">🏢 选择会议室</h2>
 
       <div class="monitor-grid">
         <div
@@ -160,7 +160,7 @@ onMounted(() => {
       </div>
 
       <div class="selected-count">
-        已选择 {{ selectedMonitors.length }} 个监控点
+        已选择 {{ selectedMonitors.length }} 个会议室
       </div>
     </div>
   </div>

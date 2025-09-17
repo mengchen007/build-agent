@@ -18,11 +18,52 @@ const frameIndex = ref(0)
 const analysisFrames = ref([])
 const currentFrameIndex = ref(0)
 const progress = ref(0)
-const currentStatusMessage = ref('正在初始化深度学习模型...')
+const currentStatusMessage = ref('正在初始化会议室分析模型...')
 const showFrameAnalysis = ref(false)
 let carouselTimer = null
 
+// 分析场景配置
+const analysisScenarios = ref([
+  {
+    id: 'meeting-usage',
+    name: '会议室使用频率分析',
+    prompt: '分析会议室使用频率和预定建议？',
+    description: '分析会议室的使用模式、频率和预定冲突，提供优化建议'
+  },
+  {
+    id: 'occupancy-pattern',
+    name: '人员流动模式分析',
+    prompt: '分析人员进出和空间利用情况？',
+    description: '识别人员流动规律、空间利用效率和高峰时段'
+  },
+  {
+    id: 'booking-optimization',
+    name: '预定系统优化分析',
+    prompt: '优化会议室预定系统和资源配置？',
+    description: '分析预定冲突、资源利用率，提供系统优化方案'
+  },
+  {
+    id: 'efficiency-evaluation',
+    name: '会议效率评估分析',
+    prompt: '评估会议效率和时间管理情况？',
+    description: '分析会议时长、参与度和效率指标，提供改进建议'
+  }
+])
+const selectedScenario = ref('meeting-usage')
 
+// 切换分析场景
+const changeScenario = (scenarioId) => {
+  selectedScenario.value = scenarioId
+  const scenario = analysisScenarios.value.find(s => s.id === scenarioId)
+  if (scenario) {
+    searchInput.value.value = scenario.prompt
+  }
+}
+
+// 获取当前场景配置
+const getCurrentScenario = () => {
+  return analysisScenarios.value.find(s => s.id === selectedScenario.value) || analysisScenarios.value[0]
+}
 
 const startAnalysis = async () => {
   isAnalyzing.value = true
@@ -58,76 +99,206 @@ const startAnalysis = async () => {
 
 
 
-const showResults = () => {
-  resultDisplay.value.style.display = 'block'
-  resultDisplay.value.innerHTML = `
-    <h3 style="color: #b0b0d0; margin-bottom: 12px; font-size: 18px;">📈 一周能源效率多模态分析报告</h3>
+const generateScenarioReport = (scenarioId) => {
+  const reports = {
+    'meeting-usage': generateMeetingUsageReport(),
+    'occupancy-pattern': generateOccupancyPatternReport(),
+    'booking-optimization': generateBookingOptimizationReport(),
+    'efficiency-evaluation': generateEfficiencyEvaluationReport()
+  }
+  return reports[scenarioId] || reports['meeting-usage']
+}
 
+const generateMeetingUsageReport = () => {
+  return `
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 15px;">
       <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
-        <h4 style="color: #a0c0e0; font-size: 13px;">📊 综合评分</h4>
-        <div style="font-size: 22px; color: #90c090; font-weight: bold;">78.6%</div>
-        <p style="font-size: 10px; color: #ccc;">较上周提升 +3.2%</p>
+        <h4 style="color: #a0c0e0; font-size: 13px;">📈 使用率</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">72.3%</div>
+        <p style="font-size: 10px; color: #ccc;">较上周提升 +8.1%</p>
       </div>
-
       <div style="background: rgba(80,60,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(140,120,160,0.4);">
-        <h4 style="color: #c0a0e0; font-size: 13px;">⚡ 节能潜力</h4>
-        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">6%–11%</div>
-        <p style="font-size: 10px; color: #ccc;">预估节省 250–470 kWh/天</p>
+        <h4 style="color: #c0a0e0; font-size: 13px;">⏰ 平均会议时长</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">1.2h</div>
+        <p style="font-size: 10px; color: #ccc;">建议时长: 1.0h</p>
       </div>
-
       <div style="background: rgba(60,100,80,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,160,140,0.4);">
-        <h4 style="color: #a0e0c0; font-size: 13px;">🔋 平均功耗</h4>
-        <div style="font-size: 22px; color: #90c090; font-weight: bold;">172kW</div>
-        <p style="font-size: 10px; color: #ccc;">峰值: 260kW</p>
+        <h4 style="color: #a0e0c0; font-size: 13px;">👥 平均参会人数</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">6人</div>
+        <p style="font-size: 10px; color: #ccc;">容量利用率: 75%</p>
       </div>
-
       <div style="background: rgba(100,80,60,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(160,140,120,0.4);">
-        <h4 style="color: #e0c0a0; font-size: 13px;">🌡️ 环境指数</h4>
-        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">19.2°C</div>
-        <p style="font-size: 10px; color: #ccc;">适宜温度范围</p>
+        <h4 style="color: #e0c0a0; font-size: 13px;">📅 预定成功率</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">89.4%</div>
+        <p style="font-size: 10px; color: #ccc;">冲突率: 10.6%</p>
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-      <div style="background: rgba(50,60,70,0.4); padding: 14px; border-radius: 10px; border: 1px solid rgba(100,110,120,0.3);">
-        <h4 style="color: #9ab3c7; font-size: 16px; margin-bottom: 12px;">📊 整体使用分析</h4>
-        <div style="font-size: 16px; line-height: 1.5; color: #bbc5d0;">
-          <div style="margin-bottom: 6px;">• 高效时段：周三21:00 (91%)</div>
-          <div style="margin-bottom: 6px;">• 标准时段：周一09:00, 周五18:00</div>
-          <div style="margin-bottom: 6px;">• 待优化：周四12:00 (68%)</div>
-          <div>• 平均负载：0.79 (良好)</div>
-        </div>
-      </div>
-
-      <div style="background: rgba(60,50,70,0.4); padding: 14px; border-radius: 10px; border: 1px solid rgba(110,100,120,0.3);">
-        <h4 style="color: #b5a3c7; font-size: 16px; margin-bottom: 12px;">⚡ 能耗模式识别</h4>
-        <div style="font-size: 16px; line-height: 1.5; color: #c5bbd0;">
-          <div style="margin-bottom: 6px;">• 办公模式：42% (上午时段)</div>
-          <div style="margin-bottom: 6px;">• 高效模式：28% (晚间优化)</div>
-          <div style="margin-bottom: 6px;">• 过渡模式：18% (傍晚时段)</div>
-          <div>• 低效模式：12% (需优化)</div>
-        </div>
-      </div>
-    </div>
-
-    <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3); margin-bottom: 16px;">
-      <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">🧠 深度学习分析发现</h4>
+    <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3);">
+      <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">🤖 智能预定建议</h4>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px; color: #c0c8d0;">
         <div>
-          <div style="color: #98b5c9; margin-bottom: 8px;">🧠 神经网络识别：</div>
-          <div style="margin-bottom: 4px;">• 异常模式检测：3处长时照明</div>
-          <div style="margin-bottom: 4px;">• 行为模式分析：工作型67%</div>
-          <div>• 时序预测准确率：94.2%</div>
+          <div style="color: #98b5c9; margin-bottom: 8px;">📋 最佳预定时段：</div>
+          <div style="margin-bottom: 4px;">• 周一 09:00-10:30 (成功率98%)</div>
+          <div style="margin-bottom: 4px;">• 周三 14:00-15:30 (成功率95%)</div>
+          <div>• 周五 10:00-11:30 (成功率92%)</div>
         </div>
         <div>
-          <div style="color: #a8a0c9; margin-bottom: 8px;">📊 多维度融合：</div>
-          <div style="margin-bottom: 4px;">• 空间分布热力图：东南角密度最高</div>
-          <div style="margin-bottom: 4px;">• 时间序列趋势：总体上升3.2%</div>
-          <div>• 环境关联度：温度影响占23%</div>
+          <div style="color: #a8a0c9; margin-bottom: 8px;">⚠️ 避免时段：</div>
+          <div style="margin-bottom: 4px;">• 周二 14:00-16:00 (冲突率高)</div>
+          <div style="margin-bottom: 4px;">• 周四 13:00-14:00 (使用密集)</div>
+          <div>• 周五 16:00-17:00 (提前结束多)</div>
         </div>
       </div>
     </div>
+  `
+}
+
+const generateOccupancyPatternReport = () => {
+  return `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 15px;">
+      <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
+        <h4 style="color: #a0c0e0; font-size: 13px;">👥 人员密度</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">4.2人/㎡</div>
+        <p style="font-size: 10px; color: #ccc;">峰值: 6.8人/㎡</p>
+      </div>
+      <div style="background: rgba(80,60,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(140,120,160,0.4);">
+        <h4 style="color: #c0a0e0; font-size: 13px;">🚶 流动频率</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">24次/天</div>
+        <p style="font-size: 10px; color: #ccc;">高峰: 上午10-11点</p>
+      </div>
+      <div style="background: rgba(60,100,80,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,160,140,0.4);">
+        <h4 style="color: #a0e0c0; font-size: 13px;">📊 空间利用</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">68%</div>
+        <p style="font-size: 10px; color: #ccc;">最优区域: 靠窗位置</p>
+      </div>
+      <div style="background: rgba(100,80,60,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(160,140,120,0.4);">
+        <h4 style="color: #e0c0a0; font-size: 13px;">⏱️ 停留时长</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">1.8h</div>
+        <p style="font-size: 10px; color: #ccc;">中位数: 1.5h</p>
+      </div>
+    </div>
+
+    <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3);">
+      <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">🎯 人员流动优化建议</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px; color: #c0c8d0;">
+        <div>
+          <div style="color: #98b5c9; margin-bottom: 8px;">📈 高效流动模式：</div>
+          <div style="margin-bottom: 4px;">• 进出口分离设计 (减少拥堵35%)</div>
+          <div style="margin-bottom: 4px;">• 座位预分配系统 (提升效率28%)</div>
+          <div>• 智能引导标识 (缩短寻找时间40%)</div>
+        </div>
+        <div>
+          <div style="color: #a8a0c9; margin-bottom: 8px;">⚠️ 拥堵预警：</div>
+          <div style="margin-bottom: 4px;">• 周二14:00-15:00 入口拥堵</div>
+          <div style="margin-bottom: 4px;">• 会议结束高峰期疏散慢</div>
+          <div>• 靠门位置利用率过高</div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+const generateBookingOptimizationReport = () => {
+  return `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 15px;">
+      <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
+        <h4 style="color: #a0c0e0; font-size: 13px;">📋 预定冲突率</h4>
+        <div style="font-size: 22px; color: #ff9090; font-weight: bold;">12.3%</div>
+        <p style="font-size: 10px; color: #ccc;">较上月下降 -5.2%</p>
+      </div>
+      <div style="background: rgba(80,60,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(140,120,160,0.4);">
+        <h4 style="color: #c0a0e0; font-size: 13px;">⚡ 系统响应时间</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">0.8s</div>
+        <p style="font-size: 10px; color: #ccc;">目标: <1.0s</p>
+      </div>
+      <div style="background: rgba(60,100,80,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,160,140,0.4);">
+        <h4 style="color: #a0e0c0; font-size: 13px;">📱 移动端使用率</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">76%</div>
+        <p style="font-size: 10px; color: #ccc;">PC端: 24%</p>
+      </div>
+      <div style="background: rgba(100,80,60,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(160,140,120,0.4);">
+        <h4 style="color: #e0c0a0; font-size: 13px;">🔄 取消率</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">8.9%</div>
+        <p style="font-size: 10px; color: #ccc;">主要原因: 临时变更</p>
+      </div>
+    </div>
+
+    <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3);">
+      <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">🛠️ 系统优化建议</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px; color: #c0c8d0;">
+        <div>
+          <div style="color: #98b5c9; margin-bottom: 8px;">🚀 功能增强：</div>
+          <div style="margin-bottom: 4px;">• 智能推荐空闲会议室</div>
+          <div style="margin-bottom: 4px;">• 自动分配最佳时段</div>
+          <div>• 冲突预警和替代方案</div>
+        </div>
+        <div>
+          <div style="color: #a8a0c9; margin-bottom: 8px;">⚙️ 技术优化：</div>
+          <div style="margin-bottom: 4px;">• 缓存机制优化响应速度</div>
+          <div style="margin-bottom: 4px;">• 并发预定锁机制</div>
+          <div>• 负载均衡提升稳定性</div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+const generateEfficiencyEvaluationReport = () => {
+  return `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 15px;">
+      <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
+        <h4 style="color: #a0c0e0; font-size: 13px;">📊 会议效率指数</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">7.3/10</div>
+        <p style="font-size: 10px; color: #ccc;">较上季度 +0.8</p>
+      </div>
+      <div style="background: rgba(80,60,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(140,120,160,0.4);">
+        <h4 style="color: #c0a0e0; font-size: 13px;">⏰ 准时开始率</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">82%</div>
+        <p style="font-size: 10px; color: #ccc;">平均延迟: 4分钟</p>
+      </div>
+      <div style="background: rgba(60,100,80,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,160,140,0.4);">
+        <h4 style="color: #a0e0c0; font-size: 13px;">👥 参与度</h4>
+        <div style="font-size: 22px; color: #90c090; font-weight: bold;">68%</div>
+        <p style="font-size: 10px; color: #ccc;">活跃讨论比例</p>
+      </div>
+      <div style="background: rgba(100,80,60,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(160,140,120,0.4);">
+        <h4 style="color: #e0c0a0; font-size: 13px;">📋 议程完成度</h4>
+        <div style="font-size: 22px; color: #d0d090; font-weight: bold;">75%</div>
+        <p style="font-size: 10px; color: #ccc;">平均超时: 15分钟</p>
+      </div>
+    </div>
+
+    <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3);">
+      <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">📈 效率提升建议</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px; color: #c0c8d0;">
+        <div>
+          <div style="color: #98b5c9; margin-bottom: 8px;">🎯 会议优化：</div>
+          <div style="margin-bottom: 4px;">• 会前准备时间预留5分钟</div>
+          <div style="margin-bottom: 4px;">• 设置议程时间提醒</div>
+          <div>• 引入会议效率评分机制</div>
+        </div>
+        <div>
+          <div style="color: #a8a0c9; margin-bottom: 8px;">🔧 工具支持：</div>
+          <div style="margin-bottom: 4px;">• 智能日程冲突检测</div>
+          <div style="margin-bottom: 4px;">• 会议记录AI总结</div>
+          <div>• 参与度实时监控</div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+const showResults = () => {
+  resultDisplay.value.style.display = 'block'
+  const currentScenario = getCurrentScenario()
+
+  // 根据不同场景生成不同报告
+  const reportContent = generateScenarioReport(currentScenario.id)
+
+  resultDisplay.value.innerHTML = `
+    <h3 style="color: #b0b0d0; margin-bottom: 12px; font-size: 18px;">📊 ${currentScenario.name}报告</h3>
+    ${reportContent}
   `
 }
 
@@ -151,18 +322,18 @@ const stopCarousel = () => {
 
 const runAnalysisSteps = async () => {
   const steps = [
-    { message: '正在加载视频数据...', progress: 5 },
-    { message: '初始化多模态AI模型...', progress: 10 },
-    { message: '提取关键帧进行分析...', progress: 15 },
-    { message: '执行深度学习预处理...', progress: 25 },
-    { message: '能源使用模式识别...', progress: 35 },
-    { message: '时间序列数据分析...', progress: 45 },
-    { message: '空间分布模式分析...', progress: 55 },
-    { message: '异常检测和模式识别...', progress: 65 },
-    { message: '效率指标计算...', progress: 75 },
-    { message: '智能优化建议生成...', progress: 85 },
-    { message: '综合评估报告生成...', progress: 95 },
-    { message: '✅ 多模态分析完成！', progress: 100 }
+    { message: '正在加载监控视频数据...', progress: 5 },
+    { message: '初始化会议室分析AI模型...', progress: 10 },
+    { message: '提取关键帧进行人员识别...', progress: 15 },
+    { message: '执行人数统计和行为分析...', progress: 25 },
+    { message: '会议室使用模式识别...', progress: 35 },
+    { message: '使用频率时序数据分析...', progress: 45 },
+    { message: '人员流动和空间利用分析...', progress: 55 },
+    { message: '会议时长和冲突检测...', progress: 65 },
+    { message: '使用效率指标计算...', progress: 75 },
+    { message: '智能预定建议生成...', progress: 85 },
+    { message: '会议室优化报告生成...', progress: 95 },
+    { message: '✅ 会议室分析完成！', progress: 100 }
   ]
 
   for (let i = 0; i < steps.length; i++) {
@@ -192,11 +363,11 @@ const generateAnalysisFrames = () => {
   ]
 
   analysisFrames.value = [
-    { time: '09:00', energy: 85, frame: imageUrls[0] },
-    { time: '15:00', energy: 72, frame: imageUrls[1] },
-    { time: '21:00', energy: 91, frame: imageUrls[2] },
-    { time: '12:00', energy: 68, frame: imageUrls[3] },
-    { time: '18:00', energy: 78, frame: imageUrls[4] }
+    { time: '09:00', occupancy: 85, frame: imageUrls[0] },
+    { time: '15:00', occupancy: 72, frame: imageUrls[1] },
+    { time: '21:00', occupancy: 45, frame: imageUrls[2] },
+    { time: '12:00', occupancy: 68, frame: imageUrls[3] },
+    { time: '18:00', occupancy: 30, frame: imageUrls[4] }
   ]
 }
 
@@ -211,12 +382,12 @@ const displayFrameAnalysis = (frameIndex) => {
     extractionInfo.value.innerHTML = `
       <h4 style="color: #00f5ff; margin-bottom: 10px; font-size: 15px;">🔍 ${analysisDetails.title}</h4>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 15px;">
-        <div>⚡ 能源效率: <span style="color: #00ff00">${frame.energy}%</span></div>
-        <div>🌡️ 环境温度: <span style="color: #ffff00">${analysisDetails.temp}°C</span></div>
-        <div>💡 设备状态: <span style="color: #00ffff">${analysisDetails.devices}</span></div>
-        <div>📊 负载系数: <span style="color: #ff00ff">${analysisDetails.load}</span></div>
-        <div>🔋 功耗预估: <span style="color: #ffa500">${analysisDetails.power}</span></div>
-        <div>🎯 模式识别: <span style="color: #00ff80">${analysisDetails.mode}</span></div>
+        <div>📈 使用率: <span style="color: #00ff00">${frame.occupancy}%</span></div>
+        <div>👥 人数统计: <span style="color: #ffff00">${analysisDetails.peopleCount}</span></div>
+        <div>⏰ 会议时长: <span style="color: #00ffff">${analysisDetails.duration}</span></div>
+        <div>📊 空间利用: <span style="color: #ff00ff">${analysisDetails.spaceUtil}</span></div>
+        <div>🎯 会议类型: <span style="color: #ffa500">${analysisDetails.meetingType}</span></div>
+        <div>📅 预定状态: <span style="color: #00ff80">${analysisDetails.bookingStatus}</span></div>
       </div>
       <div style="margin-top: 10px; padding: 8px; background: rgba(0,255,255,0.1); border-radius: 5px;">
         <div style="font-size: 15px; color: #00ffff;">🔮 AI分析维度: ${analysisDetails.dimension}</div>
@@ -229,59 +400,59 @@ const displayFrameAnalysis = (frameIndex) => {
 const getDetailedAnalysisInfo = (frameIndex, frame) => {
   const analysisTemplates = [
     {
-      title: '周一上午能源模式分析 (09:00)',
-      temp: (18 + Math.random() * 4).toFixed(1),
-      devices: '空调+照明+设备',
-      load: '0.85',
-      power: '12.4 kWh',
-      mode: '办公高效模式',
-      dimension: '时间序列 + 空间分布',
+      title: '周一上午高峰时段分析 (09:00)',
+      peopleCount: '6-8人',
+      duration: '1.5小时',
+      spaceUtil: '85%',
+      meetingType: '团队晨会',
+      bookingStatus: '已预定',
+      dimension: '人员识别 + 行为分析',
       confidence: (88 + Math.random() * 8).toFixed(1),
-      processing: '深度卷积分析'
+      processing: '人脸识别AI'
     },
     {
-      title: '周二下午负载分析 (15:00)',
-      temp: (20 + Math.random() * 3).toFixed(1),
-      devices: '空调+部分照明',
-      load: '0.72',
-      power: '9.8 kWh',
-      mode: '标准工作模式',
-      dimension: '热力图 + 行为识别',
+      title: '周二下午会议分析 (15:00)',
+      peopleCount: '4-6人',
+      duration: '2.0小时',
+      spaceUtil: '72%',
+      meetingType: '项目讨论',
+      bookingStatus: '已预定',
+      dimension: '空间利用 + 时长预测',
       confidence: (85 + Math.random() * 10).toFixed(1),
-      processing: '多模态融合'
+      processing: '行为分析模型'
     },
     {
-      title: '周三晚间峰值分析 (21:00)',
-      temp: (16 + Math.random() * 3).toFixed(1),
-      devices: '全部设备运行',
-      load: '0.91',
-      power: '15.2 kWh',
-      mode: '夜间高效模式',
-      dimension: '异常检测 + 模式识别',
+      title: '周三晚间使用分析 (21:00)',
+      peopleCount: '2-3人',
+      duration: '0.8小时',
+      spaceUtil: '45%',
+      meetingType: '临时讨论',
+      bookingStatus: '临时使用',
+      dimension: '异常检测 + 使用模式',
       confidence: (92 + Math.random() * 6).toFixed(1),
-      processing: 'Transformer模型'
+      processing: '时序分析网络'
     },
     {
       title: '周四中午低效分析 (12:00)',
-      temp: (22 + Math.random() * 4).toFixed(1),
-      devices: '空调过载+照明',
-      load: '0.68',
-      power: '8.5 kWh',
-      mode: '优化待改进',
-      dimension: '能耗异常 + 环境因子',
+      peopleCount: '3-4人',
+      duration: '0.5小时',
+      spaceUtil: '68%',
+      meetingType: '简短汇报',
+      bookingStatus: '冲突预定',
+      dimension: '冲突检测 + 优化建议',
       confidence: (79 + Math.random() * 12).toFixed(1),
-      processing: '决策树分析'
+      processing: '冲突分析算法'
     },
     {
-      title: '周五傍晚过渡分析 (18:00)',
-      temp: (19 + Math.random() * 3).toFixed(1),
-      devices: '渐进式启动',
-      load: '0.78',
-      power: '11.1 kWh',
-      mode: '过渡平衡模式',
-      dimension: '时序预测 + 趋势分析',
+      title: '周五下午闲置分析 (18:00)',
+      peopleCount: '0人',
+      duration: '0小时',
+      spaceUtil: '30%',
+      meetingType: '空置状态',
+      bookingStatus: '可预定',
+      dimension: '空置检测 + 预定建议',
       confidence: (86 + Math.random() * 9).toFixed(1),
-      processing: 'LSTM时序网络'
+      processing: '空置优化模型'
     }
   ]
 
@@ -296,11 +467,11 @@ const handleImageError = (event) => {
   console.log('图片加载失败，使用占位图')
   if (analysisFrames.value[currentFrameIndex.value]) {
     const frame = analysisFrames.value[currentFrameIndex.value]
-    event.target.src = createEnergyFrame(frame.energy, `分析帧 ${currentFrameIndex.value + 1}`)
+    event.target.src = createMeetingRoomFrame(frame.occupancy, `分析帧 ${currentFrameIndex.value + 1}`)
   }
 }
 
-const createEnergyFrame = (efficiency, timeLabel) => {
+const createMeetingRoomFrame = (occupancy, timeLabel) => {
   const canvas = document.createElement('canvas')
   canvas.width = 800
   canvas.height = 600
@@ -313,16 +484,16 @@ const createEnergyFrame = (efficiency, timeLabel) => {
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, 800, 600)
 
-  // 绘制能源效率可视化
+  // 绘制会议室使用率可视化
   ctx.strokeStyle = '#00ffff'
   ctx.lineWidth = 3
   ctx.beginPath()
 
-  // 绘制效率曲线
+  // 绘制使用率曲线
   for (let i = 0; i < 24; i++) {
     const x = 50 + (i * 30)
     const baseY = 400
-    const variation = Math.sin(i * 0.5) * 50 + (efficiency / 100) * 100
+    const variation = Math.sin(i * 0.3) * 40 + (occupancy / 100) * 80
     const y = baseY - variation
 
     if (i === 0) ctx.moveTo(x, y)
@@ -334,20 +505,20 @@ const createEnergyFrame = (efficiency, timeLabel) => {
   ctx.fillStyle = '#00ffff'
   ctx.font = 'bold 24px Arial'
   ctx.textAlign = 'center'
-  ctx.fillText(`能源效率分析 - ${timeLabel}`, 400, 50)
+  ctx.fillText(`会议室使用分析 - ${timeLabel}`, 400, 50)
 
-  // 效率值
-  ctx.fillStyle = efficiency > 80 ? '#00ff00' : efficiency > 60 ? '#ffff00' : '#ff6600'
+  // 使用率值
+  ctx.fillStyle = occupancy > 70 ? '#00ff00' : occupancy > 40 ? '#ffff00' : '#ff6600'
   ctx.font = 'bold 48px Arial'
-  ctx.fillText(`${efficiency}%`, 400, 150)
+  ctx.fillText(`${occupancy}%`, 400, 150)
 
   // 详细信息
   ctx.fillStyle = '#ffffff'
   ctx.font = '16px Arial'
   ctx.textAlign = 'left'
   ctx.fillText(`时间段: ${timeLabel}`, 50, 500)
-  ctx.fillText(`平均功耗: ${(efficiency * 1.2).toFixed(1)} kW`, 50, 530)
-  ctx.fillText(`碳排放: ${(100 - efficiency) * 0.5} kg CO₂`, 50, 560)
+  ctx.fillText(`预估人数: ${Math.ceil(occupancy / 12)} 人`, 50, 530)
+  ctx.fillText(`空间利用: ${occupancy > 50 ? '高' : '低'}`, 50, 560)
 
   return canvas.toDataURL()
 }
@@ -360,10 +531,30 @@ onMounted(() => {
 
 <template>
   <div class="center-panel">
+    <div class="scenario-selector">
+      <label class="scenario-label">分析场景：</label>
+      <select
+        v-model="selectedScenario"
+        @change="changeScenario(selectedScenario)"
+        class="scenario-select"
+      >
+        <option
+          v-for="scenario in analysisScenarios"
+          :key="scenario.id"
+          :value="scenario.id"
+        >
+          {{ scenario.name }}
+        </option>
+      </select>
+    </div>
+
     <div class="search-container">
       <div class="search-box">
-        <input type="text" class="search-input" ref="searchInput" placeholder="请评估过去一周能源使用效率？" value="请评估过去一周能源使用效率">
+        <input type="text" class="search-input" ref="searchInput" placeholder="分析会议室使用频率和预定建议？" value="分析会议室使用频率和预定建议">
         <button class="analyze-btn" ref="analyzeBtn">开始分析</button>
+      </div>
+      <div class="scenario-description">
+        {{ getCurrentScenario().description }}
       </div>
     </div>
 
@@ -395,7 +586,7 @@ onMounted(() => {
       <!-- <IntelligentThinkingProcess ref="intelligentThinkingProcess" /> -->
 
       <div class="result-display" ref="resultDisplay">
-        <h3 style="color: #ff00ff; margin-bottom: 20px;">📈 能源效率评估报告</h3>
+        <h3 style="color: #ff00ff; margin-bottom: 20px;">📊 会议室使用分析报告</h3>
         <div id="analysisResults"></div>
       </div>
     </div>
@@ -447,10 +638,61 @@ onMounted(() => {
   pointer-events: none;
 }
 
+.scenario-selector {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  position: relative;
+}
+
+.scenario-label {
+  color: #a0c0e0;
+  font-size: 14px;
+  font-weight: bold;
+  min-width: 80px;
+}
+
+.scenario-select {
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border: 1px solid rgba(120, 140, 160, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  max-width: 300px;
+}
+
+.scenario-select:hover {
+  border-color: rgba(160, 192, 224, 0.6);
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.scenario-select option {
+  background: rgba(20, 25, 35, 0.95);
+  color: #fff;
+  padding: 8px;
+}
+
 .search-container {
   position: relative;
   margin-bottom: 20px;
   z-index: 10;
+}
+
+.scenario-description {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border-left: 3px solid rgba(160, 192, 224, 0.5);
 }
 
 .search-box {

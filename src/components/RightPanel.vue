@@ -134,7 +134,7 @@ onMounted(() => {
       <div class="node-status-card">
         <div class="node-header">
           <div class="node-indicator active"></div>
-          <div class="node-name">1F-大厅区域</div>
+          <div class="node-name">会议室A101</div>
           <div class="node-status-badge active">活跃</div>
         </div>
         <div class="node-details">
@@ -159,7 +159,7 @@ onMounted(() => {
       <div class="node-status-card">
         <div class="node-header">
           <div class="node-indicator active"></div>
-          <div class="node-name">2F-办公区域</div>
+          <div class="node-name">会议室B203</div>
           <div class="node-status-badge active">活跃</div>
         </div>
         <div class="node-details">
@@ -184,7 +184,7 @@ onMounted(() => {
       <div class="node-status-card">
         <div class="node-header">
           <div class="node-indicator active"></div>
-          <div class="node-name">停车场A区</div>
+          <div class="node-name">大会议室C1</div>
           <div class="node-status-badge active">活跃</div>
         </div>
         <div class="node-details">
@@ -209,7 +209,7 @@ onMounted(() => {
       <div class="node-status-card">
         <div class="node-header">
           <div class="node-indicator warning"></div>
-          <div class="node-name">停车场B区</div>
+          <div class="node-name">小会议室D2</div>
           <div class="node-status-badge active">活跃</div>
         </div>
         <div class="node-details">
