@@ -1,7 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { analysisMode, neuralNodeConfigs } from '../stores/analysisMode.js'
 
 const campus3D = ref(null)
+
+// 根据分析模式获取神经节点配置
+const currentNodes = computed(() => neuralNodeConfigs[analysisMode.value])
 
 const create3DCampus = () => {
   const campus3DElement = campus3D.value
@@ -120,10 +124,17 @@ onMounted(() => {
       </div>
       <div class="scan-line"></div>
       <div class="building-info">
-        <div>📹 摄像头: 12个在线</div>
-        <div>🔍 监控覆盖: 100%</div>
-        <div>🌿 园区环境: 优良</div>
-        <div>🏢 建筑状态: 正常</div>
+        <div v-if="analysisMode === 'energy'">📹 摄像头: 12个在线</div>
+        <div v-else>📹 会议室: 6间在线</div>
+
+        <div v-if="analysisMode === 'energy'">🔍 监控覆盖: 100%</div>
+        <div v-else>🔍 监控覆盖: 100%</div>
+
+        <div v-if="analysisMode === 'energy'">🌿 园区环境: 优良</div>
+        <div v-else>📊 使用率: 71.2%</div>
+
+        <div v-if="analysisMode === 'energy'">🏢 建筑状态: 正常</div>
+        <div v-else>🏢 会议状态: 正常</div>
       </div>
     </div>
 
@@ -131,102 +142,35 @@ onMounted(() => {
     <div class="neural-nodes-section">
       <div class="section-title">⚡ 神经节点状态</div>
 
-      <div class="node-status-card">
+      <div
+        v-for="node in currentNodes"
+        :key="node.name"
+        class="node-status-card"
+      >
         <div class="node-header">
-          <div class="node-indicator active"></div>
-          <div class="node-name">1F-大厅区域</div>
-          <div class="node-status-badge active">活跃</div>
+          <div class="node-indicator" :class="node.indicator"></div>
+          <div class="node-name">{{ node.name }}</div>
+          <div class="node-status-badge" :class="node.badge">活跃</div>
         </div>
         <div class="node-details">
           <div class="detail-row">
             <span>节点数量:</span>
-            <span class="detail-value">4</span>
+            <span class="detail-value">{{ node.nodeCount }}</span>
             <span>信号强度:</span>
-            <span class="detail-value strong">97%</span>
+            <span class="detail-value" :class="node.signalStrength > 90 ? 'strong' : 'warning'">{{ node.signalStrength }}%</span>
           </div>
           <div class="detail-row">
             <span>最后同步:</span>
-            <span class="detail-value">0.8s前</span>
+            <span class="detail-value">{{ node.lastSync }}</span>
             <span>负载:</span>
-            <span class="detail-value">28%</span>
+            <span class="detail-value">{{ node.load }}%</span>
           </div>
           <div class="progress-bar-node">
-            <div class="progress-fill-node" style="width: 97%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="node-status-card">
-        <div class="node-header">
-          <div class="node-indicator active"></div>
-          <div class="node-name">2F-办公区域</div>
-          <div class="node-status-badge active">活跃</div>
-        </div>
-        <div class="node-details">
-          <div class="detail-row">
-            <span>节点数量:</span>
-            <span class="detail-value">2</span>
-            <span>信号强度:</span>
-            <span class="detail-value strong">95%</span>
-          </div>
-          <div class="detail-row">
-            <span>最后同步:</span>
-            <span class="detail-value">1.2s前</span>
-            <span>负载:</span>
-            <span class="detail-value">42%</span>
-          </div>
-          <div class="progress-bar-node">
-            <div class="progress-fill-node" style="width: 95%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="node-status-card">
-        <div class="node-header">
-          <div class="node-indicator active"></div>
-          <div class="node-name">停车场A区</div>
-          <div class="node-status-badge active">活跃</div>
-        </div>
-        <div class="node-details">
-          <div class="detail-row">
-            <span>节点数量:</span>
-            <span class="detail-value">3</span>
-            <span>信号强度:</span>
-            <span class="detail-value strong">99%</span>
-          </div>
-          <div class="detail-row">
-            <span>最后同步:</span>
-            <span class="detail-value">0.5s前</span>
-            <span>负载:</span>
-            <span class="detail-value">18%</span>
-          </div>
-          <div class="progress-bar-node">
-            <div class="progress-fill-node" style="width: 99%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="node-status-card">
-        <div class="node-header">
-          <div class="node-indicator warning"></div>
-          <div class="node-name">停车场B区</div>
-          <div class="node-status-badge active">活跃</div>
-        </div>
-        <div class="node-details">
-          <div class="detail-row">
-            <span>节点数量:</span>
-            <span class="detail-value">6</span>
-            <span>信号强度:</span>
-            <span class="detail-value warning">89%</span>
-          </div>
-          <div class="detail-row">
-            <span>最后同步:</span>
-            <span class="detail-value">2.1s前</span>
-            <span>负载:</span>
-            <span class="detail-value">56%</span>
-          </div>
-          <div class="progress-bar-node">
-            <div class="progress-fill-node warning" style="width: 89%;"></div>
+            <div
+              class="progress-fill-node"
+              :class="node.signalStrength > 90 ? '' : 'warning'"
+              :style="{ width: node.progressWidth + '%' }"
+            ></div>
           </div>
         </div>
       </div>

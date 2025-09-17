@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { analysisMode, monitorConfigs } from '../stores/analysisMode.js'
 
 const uploadZone = ref(null)
 const videoInput = ref(null)
@@ -10,15 +11,10 @@ const videoDetails = ref(null)
 
 const currentVideo = ref(null)
 const monitorIcon = '🎥'
-const monitorList = [
-  { id: 1, name: '大楼东侧', status: 'active' },
-  { id: 2, name: '大楼西侧', status: 'active' },
-  { id: 3, name: '大楼南侧', status: 'active' },
-  { id: 4, name: '大楼北侧', status: 'active' },
-  { id: 5, name: '大厅区域', status: 'active' },
-  { id: 6, name: '走廊区域', status: 'active' }
-]
-const monitors = ref(monitorList.map(item => ({ ...item, icon: monitorIcon })))
+
+// 使用计算属性根据分析模式获取监控点配置
+const currentConfig = computed(() => monitorConfigs[analysisMode.value])
+const monitors = computed(() => currentConfig.value.monitors.map(item => ({ ...item, icon: monitorIcon })))
 const selectedMonitors = ref([1, 2, 3, 4, 5, 6])
 
 const toggleMonitor = (monitorId) => {
@@ -114,11 +110,11 @@ onMounted(() => {
   <div class="left-panel">
     <!-- 上半部分：导入视频 -->
     <div class="video-section">
-      <h2 class="panel-title">🎥 导入视频</h2>
+      <h2 class="panel-title">{{ currentConfig.panelTitle }}</h2>
 
       <div class="upload-zone" ref="uploadZone">
         <div class="upload-icon">📁</div>
-        <p>拖拽视频文件到此处</p>
+        <p>{{ analysisMode === 'energy' ? '拖拽视频文件到此处' : '拖拽会议录像到此处' }}</p>
         <p style="font-size: 12px; color: #888; margin-top: 5px;">
           支持 MP4, AVI, MOV 格式
         </p>
@@ -137,7 +133,7 @@ onMounted(() => {
 
     <!-- 下半部分：接入监控 -->
     <div class="monitor-section">
-      <h2 class="panel-title">📹 接入监控</h2>
+      <h2 class="panel-title">{{ currentConfig.monitorTitle }}</h2>
 
       <div class="monitor-grid">
         <div
@@ -338,7 +334,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 4px;
+  padding: 6px 2px;
   background: rgba(40, 50, 70, 0.6);
   border: 1px solid rgba(80, 100, 120, 0.3);
   border-radius: 6px;
@@ -346,7 +342,7 @@ onMounted(() => {
   transition: all 0.3s ease;
   position: relative;
   aspect-ratio: 1;
-  min-height: 0;
+  min-height: 80px;
 }
 
 .monitor-item:hover {
@@ -362,21 +358,22 @@ onMounted(() => {
 
 .monitor-icon {
   color: #a0c0e0;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .monitor-name {
-  font-size: 16px;
+  font-size: 11px;
   color: #ccc;
   text-align: center;
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 100%;
+  padding: 0 2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .monitor-status {
