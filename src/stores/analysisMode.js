@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 // 全局分析模式状态
-export const analysisMode = ref('energy') // 'energy' or 'meetingroom'
+export const analysisMode = ref('energy') // 'energy', 'meetingroom', or 'parking'
 
 // 监控点配置
 export const monitorConfigs = {
@@ -28,6 +28,18 @@ export const monitorConfigs = {
     ],
     panelTitle: '🎥 导入会议录像',
     monitorTitle: '📹 接入会议室监控'
+  },
+  parking: {
+    monitors: [
+      { id: 1, name: '东门停车区', status: 'active' },
+      { id: 2, name: '西门停车区', status: 'active' },
+      { id: 3, name: '南广场区域', status: 'active' },
+      { id: 4, name: '北侧路边区', status: 'active' },
+      { id: 5, name: '地下停车场', status: 'active' },
+      { id: 6, name: '访客停车区', status: 'active' }
+    ],
+    panelTitle: '🎥 导入监控录像',
+    monitorTitle: '📹 接入停车监控'
   }
 }
 
@@ -115,6 +127,48 @@ export const neuralNodeConfigs = {
       lastSync: '2.3s前',
       load: 68,
       progressWidth: 87
+    }
+  ],
+  parking: [
+    {
+      name: '东门停车监控',
+      indicator: 'active',
+      badge: 'active',
+      nodeCount: 6,
+      signalStrength: 98,
+      lastSync: '0.4s前',
+      load: 15,
+      progressWidth: 98
+    },
+    {
+      name: '西门停车监控',
+      indicator: 'active',
+      badge: 'active',
+      nodeCount: 4,
+      signalStrength: 96,
+      lastSync: '0.7s前',
+      load: 23,
+      progressWidth: 96
+    },
+    {
+      name: '南广场监控',
+      indicator: 'warning',
+      badge: 'active',
+      nodeCount: 8,
+      signalStrength: 88,
+      lastSync: '1.8s前',
+      load: 45,
+      progressWidth: 88
+    },
+    {
+      name: '路边停车监控',
+      indicator: 'active',
+      badge: 'active',
+      nodeCount: 3,
+      signalStrength: 94,
+      lastSync: '1.1s前',
+      load: 32,
+      progressWidth: 94
     }
   ]
 }

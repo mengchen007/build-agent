@@ -132,7 +132,7 @@ const showResults = () => {
         </div>
       </div>
     `
-  } else {
+  } else if (analysisMode.value === 'meetingroom') {
     resultDisplay.value.innerHTML = `
       <h3 style="color: #b0b0d0; margin-bottom: 12px; font-size: 18px;">📊 一周会议室使用率多模态分析报告</h3>
 
@@ -202,6 +202,77 @@ const showResults = () => {
         </div>
       </div>
     `
+  } else {
+    // parking mode
+    resultDisplay.value.innerHTML = `
+      <h3 style="color: #b0b0d0; margin-bottom: 12px; font-size: 18px;">🚗 一周停车行为安全分析报告</h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 15px;">
+        <div style="background: rgba(60,80,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,140,160,0.4);">
+          <h4 style="color: #a0c0e0; font-size: 13px;">🚨 违规检测</h4>
+          <div style="font-size: 22px; color: #ff6600; font-weight: bold;">16起</div>
+          <p style="font-size: 10px; color: #ccc;">较上周减少 -23%</p>
+        </div>
+
+        <div style="background: rgba(80,60,100,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(140,120,160,0.4);">
+          <h4 style="color: #c0a0e0; font-size: 13px;">⚠️ 可疑行为</h4>
+          <div style="font-size: 22px; color: #ff0066; font-weight: bold;">10起</div>
+          <p style="font-size: 10px; color: #ccc;">需重点关注</p>
+        </div>
+
+        <div style="background: rgba(60,100,80,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(120,160,140,0.4);">
+          <h4 style="color: #a0e0c0; font-size: 13px;">🚗 车辆监测</h4>
+          <div style="font-size: 22px; color: #90c090; font-weight: bold;">143台</div>
+          <p style="font-size: 10px; color: #ccc;">日均: 21台</p>
+        </div>
+
+        <div style="background: rgba(100,80,60,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(160,140,120,0.4);">
+          <h4 style="color: #e0c0a0; font-size: 13px;">🛡️ 安全指数</h4>
+          <div style="font-size: 22px; color: #d0d090; font-weight: bold;">82.4%</div>
+          <p style="font-size: 10px; color: #ccc;">安全等级: 良好</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="background: rgba(50,60,70,0.4); padding: 14px; border-radius: 10px; border: 1px solid rgba(100,110,120,0.3);">
+          <h4 style="color: #9ab3c7; font-size: 16px; margin-bottom: 12px;">🕐 时段风险分析</h4>
+          <div style="font-size: 16px; line-height: 1.5; color: #bbc5d0;">
+            <div style="margin-bottom: 6px;">• 高风险时段：20:15 (6起违规)</div>
+            <div style="margin-bottom: 6px;">• 中风险时段：12:45, 22:30</div>
+            <div style="margin-bottom: 6px;">• 低风险时段：08:30, 17:20</div>
+            <div>• 平均风险：中等 (需要关注)</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(60,50,70,0.4); padding: 14px; border-radius: 10px; border: 1px solid rgba(110,100,120,0.3);">
+          <h4 style="color: #b5a3c7; font-size: 16px; margin-bottom: 12px;">📍 区域违规分布</h4>
+          <div style="font-size: 16px; line-height: 1.5; color: #c5bbd0;">
+            <div style="margin-bottom: 6px;">• 北侧路边区：37% (高发区)</div>
+            <div style="margin-bottom: 6px;">• 西门停车区：25% (重点区)</div>
+            <div style="margin-bottom: 6px;">• 地下停车场：19% (中等)</div>
+            <div>• 其他区域：19% (分散型)</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: rgba(55,65,75,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(105,115,125,0.3); margin-bottom: 16px;">
+        <h4 style="color: #a8b8c8; font-size: 16px; margin-bottom: 12px;">🧠 智能行为分析发现</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px; color: #c0c8d0;">
+          <div>
+            <div style="color: #98b5c9; margin-bottom: 8px;">🎯 可疑行为识别：</div>
+            <div style="margin-bottom: 4px;">• 长时停留检测：北侧路边3起</div>
+            <div style="margin-bottom: 4px;">• 异常停车模式：非常规位置7起</div>
+            <div>• 夜间违规准确率：91.3%</div>
+          </div>
+          <div>
+            <div style="color: #a8a0c9; margin-bottom: 8px;">🚨 安全预警建议：</div>
+            <div style="margin-bottom: 4px;">• 加强巡逻：北侧路边区晚间时段</div>
+            <div style="margin-bottom: 4px;">• 增设警示：西门停车区提醒标识</div>
+            <div>• 智能监控：重点区域实时预警</div>
+          </div>
+        </div>
+      </div>
+    `
   }
 }
 
@@ -254,7 +325,22 @@ const runAnalysisSteps = async () => {
     { message: '会议室分析完成！', progress: 100 }
   ]
 
-  const steps = analysisMode.value === 'energy' ? energySteps : meetingRoomSteps
+  const parkingSteps = [
+    { message: '正在加载停车监控数据...', progress: 5 },
+    { message: '初始化车辆识别模型...', progress: 10 },
+    { message: '提取停车区域关键帧...', progress: 15 },
+    { message: '执行车辆检测预处理...', progress: 25 },
+    { message: '分析历史停车模式...', progress: 35 },
+    { message: '检测异常停车行为...', progress: 45 },
+    { message: '识别可疑停车位置...', progress: 55 },
+    { message: '违规停车行为分析...', progress: 65 },
+    { message: '风险评估指标计算...', progress: 75 },
+    { message: '安全预警建议生成...', progress: 85 },
+    { message: '停车行为分析报告生成...', progress: 95 },
+    { message: '停车行为分析完成！', progress: 100 }
+  ]
+
+  const steps = analysisMode.value === 'energy' ? energySteps : analysisMode.value === 'meetingroom' ? meetingRoomSteps : parkingSteps
 
   for (let i = 0; i < steps.length; i++) {
     currentStatusMessage.value = steps[i].message
@@ -291,7 +377,7 @@ const generateAnalysisFrames = () => {
       { time: '12:00', energy: 68, frame: imageUrls[3] },
       { time: '18:00', energy: 78, frame: imageUrls[4] }
     ]
-  } else {
+  } else if (analysisMode.value === 'meetingroom') {
     imageUrls = [
       new URL('@/assets/6.png', import.meta.url).href,
       new URL('@/assets/7.png', import.meta.url).href,
@@ -305,6 +391,22 @@ const generateAnalysisFrames = () => {
       { time: '21:00', utilization: 32, participants: 2, frame: imageUrls[2] },
       { time: '12:00', utilization: 95, participants: 8, frame: imageUrls[3] },
       { time: '18:00', utilization: 64, participants: 3, frame: imageUrls[4] }
+    ]
+  } else {
+    // parking mode
+    imageUrls = [
+      new URL('@/assets/11.png', import.meta.url).href,
+      new URL('@/assets/12.png', import.meta.url).href,
+      new URL('@/assets/13.png', import.meta.url).href,
+      new URL('@/assets/14.png', import.meta.url).href,
+      new URL('@/assets/15.png', import.meta.url).href
+    ]
+    analysisFrames.value = [
+      { time: '08:30', violations: 2, vehicles: 15, suspiciousCount: 1, frame: imageUrls[0] },
+      { time: '12:45', violations: 4, vehicles: 23, suspiciousCount: 3, frame: imageUrls[1] },
+      { time: '17:20', violations: 1, vehicles: 18, suspiciousCount: 0, frame: imageUrls[2] },
+      { time: '20:15', violations: 6, vehicles: 12, suspiciousCount: 4, frame: imageUrls[3] },
+      { time: '22:30', violations: 3, vehicles: 8, suspiciousCount: 2, frame: imageUrls[4] }
     ]
   }
 }
@@ -333,7 +435,7 @@ const displayFrameAnalysis = (frameIndex) => {
           <div style="font-size: 15px; color: #ff00ff;">📈 置信度: ${analysisDetails.confidence}% | 处理: ${analysisDetails.processing}</div>
         </div>
       `
-    } else {
+    } else if (analysisMode.value === 'meetingroom') {
       extractionInfo.value.innerHTML = `
         <h4 style="color: #00f5ff; margin-bottom: 10px; font-size: 15px;">🔍 ${analysisDetails.title}</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 15px;">
@@ -345,6 +447,23 @@ const displayFrameAnalysis = (frameIndex) => {
           <div>🎯 使用类型: <span style="color: #00ff80">${analysisDetails.meetingType}</span></div>
         </div>
         <div style="margin-top: 10px; padding: 8px; background: rgba(0,255,255,0.1); border-radius: 5px;">
+          <div style="font-size: 15px; color: #00ffff;">🔮 AI分析维度: ${analysisDetails.dimension}</div>
+          <div style="font-size: 15px; color: #ff00ff;">📈 置信度: ${analysisDetails.confidence}% | 处理: ${analysisDetails.processing}</div>
+        </div>
+      `
+    } else {
+      // parking mode
+      extractionInfo.value.innerHTML = `
+        <h4 style="color: #00f5ff; margin-bottom: 10px; font-size: 15px;">🔍 ${analysisDetails.title}</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 15px;">
+          <div>🚗 检测车辆: <span style="color: #00ff00">${frame.vehicles}台</span></div>
+          <div>⚠️ 违规停车: <span style="color: #ff6600">${frame.violations}起</span></div>
+          <div>🚨 可疑行为: <span style="color: #ff0066">${frame.suspiciousCount}起</span></div>
+          <div>📍 监控区域: <span style="color: #00ffff">${analysisDetails.area}</span></div>
+          <div>⏰ 停留时长: <span style="color: #ffff00">${analysisDetails.duration}</span></div>
+          <div>🎯 风险等级: <span style="color: #ff00ff">${analysisDetails.riskLevel}</span></div>
+        </div>
+        <div style="margin-top: 10px; padding: 8px; background: rgba(255,0,100,0.1); border-radius: 5px;">
           <div style="font-size: 15px; color: #00ffff;">🔮 AI分析维度: ${analysisDetails.dimension}</div>
           <div style="font-size: 15px; color: #ff00ff;">📈 置信度: ${analysisDetails.confidence}% | 处理: ${analysisDetails.processing}</div>
         </div>
@@ -413,7 +532,7 @@ const getDetailedAnalysisInfo = (frameIndex, frame) => {
       }
     ]
     return energyTemplates[frameIndex] || energyTemplates[0]
-  } else {
+  } else if (analysisMode.value === 'meetingroom') {
     const meetingRoomTemplates = [
       {
         title: '周一上午会议室分析 (09:00)',
@@ -467,6 +586,56 @@ const getDetailedAnalysisInfo = (frameIndex, frame) => {
       }
     ]
     return meetingRoomTemplates[frameIndex] || meetingRoomTemplates[0]
+  } else {
+    // parking mode
+    const parkingTemplates = [
+      {
+        title: '周一早高峰停车分析 (08:30)',
+        area: '东门停车区',
+        duration: '平均45分钟',
+        riskLevel: '低风险',
+        dimension: '车辆识别 + 行为分析',
+        confidence: (91 + Math.random() * 7).toFixed(1),
+        processing: '目标跟踪算法'
+      },
+      {
+        title: '周二午高峰停车分析 (12:45)',
+        area: '西门停车区',
+        duration: '平均2小时15分钟',
+        riskLevel: '中风险',
+        dimension: '异常检测 + 位置分析',
+        confidence: (85 + Math.random() * 10).toFixed(1),
+        processing: '行为模式识别'
+      },
+      {
+        title: '周三下午停车分析 (17:20)',
+        area: '南广场区域',
+        duration: '平均1小时30分钟',
+        riskLevel: '低风险',
+        dimension: '时序分析 + 空间定位',
+        confidence: (93 + Math.random() * 5).toFixed(1),
+        processing: '智能预警系统'
+      },
+      {
+        title: '周四晚间停车分析 (20:15)',
+        area: '北侧路边区',
+        duration: '平均3小时45分钟',
+        riskLevel: '高风险',
+        dimension: '长时停留 + 违规检测',
+        confidence: (78 + Math.random() * 15).toFixed(1),
+        processing: '风险评估模型'
+      },
+      {
+        title: '周五深夜停车分析 (22:30)',
+        area: '地下停车场',
+        duration: '平均8小时+',
+        riskLevel: '中风险',
+        dimension: '夜间监控 + 安全分析',
+        confidence: (88 + Math.random() * 8).toFixed(1),
+        processing: '异常行为检测'
+      }
+    ]
+    return parkingTemplates[frameIndex] || parkingTemplates[0]
   }
 }
 
@@ -548,21 +717,24 @@ onMounted(() => {
 <template>
   <div class="center-panel">
     <div class="search-container">
-      <div class="mode-selector">
-        <select v-model="analysisMode" class="mode-select">
-          <option value="energy">能源使用效率分析</option>
-          <option value="meetingroom">会议室使用率分析</option>
-        </select>
-      </div>
-      <div class="search-box">
-        <input
-          type="text"
-          class="search-input"
-          ref="searchInput"
-          :placeholder="analysisMode === 'energy' ? '请评估过去一周能源使用效率？' : '请分析过去一周会议室使用情况？'"
-          :value="analysisMode === 'energy' ? '请评估过去一周能源使用效率' : '请分析过去一周会议室使用情况'"
-        >
-        <button class="analyze-btn" ref="analyzeBtn">开始分析</button>
+      <div class="search-row">
+        <div class="mode-selector">
+          <select v-model="analysisMode" class="mode-select">
+            <option value="energy">能源使用效率分析</option>
+            <option value="meetingroom">会议室使用率分析</option>
+            <option value="parking">周围停车行为分析</option>
+          </select>
+        </div>
+        <div class="search-box">
+          <input
+            type="text"
+            class="search-input"
+            ref="searchInput"
+            :placeholder="analysisMode === 'energy' ? '请评估过去一周能源使用效率？' : analysisMode === 'meetingroom' ? '请分析过去一周会议室使用情况？' : '请检测周围可疑停车行为？'"
+            :value="analysisMode === 'energy' ? '请评估过去一周能源使用效率' : analysisMode === 'meetingroom' ? '请分析过去一周会议室使用情况' : '请检测周围可疑停车行为'"
+          >
+          <button class="analyze-btn" ref="analyzeBtn">开始分析</button>
+        </div>
       </div>
     </div>
 
@@ -652,8 +824,15 @@ onMounted(() => {
   z-index: 10;
 }
 
+.search-row {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
 .mode-selector {
-  margin-bottom: 15px;
+  flex: 0 0 auto;
+  min-width: 200px;
 }
 
 .mode-select {
@@ -687,6 +866,7 @@ onMounted(() => {
   padding: 5px;
   border: 1px solid rgba(255, 100, 255, 0.35);
   box-shadow: 0 6px 24px rgba(255, 0, 255, 0.18);
+  flex: 1;
 }
 
 .search-input {
